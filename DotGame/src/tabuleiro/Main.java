@@ -13,23 +13,25 @@ public class Main {
      */
     public static void main(String[] args) {
         Tabuleiro tabuleiro = new Tabuleiro();//objeto tabuleiro
-        Scanner sc = new Scanner(System.in);
+        Scanner sc = new Scanner(System.in); //entrada 
         System.out.print("Informe o Jogador a comecar 1 ou 2: ");//dois jogadores, ou nao
-        int inicial = sc.nextInt();
-        tabuleiro.setJogador(inicial);
-        sc.skip("\n");
+        int inicial = 0;
+        try{
+            inicial = sc.nextInt();
+            tabuleiro.setJogador(inicial);
+        } catch (Exception e){
+            String lixo = sc.nextLine();
+            System.out.println("Jogador Invalido");
+            System.out.println("Jogador 1 Primeiro");
+        }
         while (!tabuleiro.acabou()) {//enquanto nao acabou
-            if (inicial != 2) {
-                tabuleiro.vezJogador();
-                int x;//posx da jogada no tabuleiro
-                int y;//posy da jogada no tabuleiro
-                String s = sc.nextLine();//jogada do jogador em String(01, 21, 34)
-                x = Character.getNumericValue(s.charAt(0));
-                y = Character.getNumericValue(s.charAt(1));
-                tabuleiro.addJogada(x, y); //adiciona a jogada
-            } else {
-                inicial = 0;
-                tabuleiro.addJogada(-1, -1);
+            tabuleiro.vezJogador();//printa o tabuleiro e quem joga
+            try{ //jogada = um numero
+                int jogada = sc.nextInt(); //pega a jogada
+                tabuleiro.addJogada(jogada); //adciona a jogada se for valida
+            } catch (Exception e){ //se nao for um numero
+                System.out.println("Informe um numero valido");
+                String lixo = sc.nextLine(); //pega o resto para ser possivel executar de novo
             }
         }
         System.out.println("\n\n\n\n");

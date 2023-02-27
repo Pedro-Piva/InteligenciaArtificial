@@ -1,7 +1,6 @@
 package tabuleiro;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 /**
  *
@@ -9,8 +8,8 @@ import java.util.Random;
  */
 public class Tabuleiro {
 
-    private final ArrayList<String> jogadas = new ArrayList(); //jogadas possiveis
-    private final char[][] tabuleiro; //tabuleiro
+    private final ArrayList<String> jogadas = new ArrayList(); //mapa de jogadas
+    private final String[][] tabuleiro; //tabuleiro
     private final ArrayList<Quadrado> quadrados; //quadrados dentro do tabuleiro
     private final int jogadores[];
     private int jogador;
@@ -20,73 +19,91 @@ public class Tabuleiro {
         jogadores[0] = 0;
         jogadores[1] = 0;
         jogador = 0;
-        tabuleiro = new char[5][5]; //inicializando tabuleiro
+        tabuleiro = new String[5][5]; //inicializando tabuleiro
         for (int i = 0; i < 5; i += 2) {
             for (int j = 0; j < 5; j += 2) {
-                tabuleiro[i][j] = '*'; //preenchendo os pontos
+                tabuleiro[i][j] = "*"; //preenchendo os pontos
             }
         }
+
+        tabuleiro[1][1] = "x";//colocando os x onde seria o centro do quadrado
+        tabuleiro[1][3] = "x";
+        tabuleiro[3][1] = "x";
+        tabuleiro[3][3] = "x";
+
+        int cont = 0;
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 5; j++) {
-                if (tabuleiro[i][j] != '*') {
-                    tabuleiro[i][j] = ' ';//preenchendo o resto com espaco
+                if (tabuleiro[i][j] == null) {
+                    tabuleiro[i][j] = Integer.toString(cont + 1);//preenchendo as jogadas
+                    jogadas.add(i + "" + j); // mapeando as jogadas
+                    cont++;
                 }
             }
         }
-        tabuleiro[1][1] = 'x';//colocando os x onde seria o centro do quadrado
-        tabuleiro[1][3] = 'x';
-        tabuleiro[3][1] = 'x';
-        tabuleiro[3][3] = 'x';
-        quadrados = new ArrayList();
-        quadrados.add(new Quadrado(new Arestas(0, 0)));
+        quadrados = new ArrayList(); //iniciando a array
+
+        quadrados.add(new Quadrado(new Arestas(0, 0))); //criando cada quadrado
         quadrados.add(new Quadrado(new Arestas(0, 2)));
         quadrados.add(new Quadrado(new Arestas(2, 0)));
         quadrados.add(new Quadrado(new Arestas(2, 2)));
-        quadrados.get(0).addLinha(0, 1);
+
+        quadrados.get(0).addLinha(0, 1); //colocando as linhas de cada quadrado
         quadrados.get(0).addLinha(1, 0);
         quadrados.get(0).addLinha(1, 2);
         quadrados.get(0).addLinha(2, 1);
+
         quadrados.get(1).addLinha(1, 2);
         quadrados.get(1).addLinha(0, 3);
         quadrados.get(1).addLinha(2, 3);
         quadrados.get(1).addLinha(1, 4);
+
         quadrados.get(2).addLinha(2, 1);
         quadrados.get(2).addLinha(3, 0);
         quadrados.get(2).addLinha(3, 2);
         quadrados.get(2).addLinha(4, 1);
+
         quadrados.get(3).addLinha(2, 3);
         quadrados.get(3).addLinha(3, 2);
         quadrados.get(3).addLinha(3, 4);
         quadrados.get(3).addLinha(4, 3);
     }
 
-    public boolean verificaJogada(int i, int j) {
-        if (i < 5 && i >= 0 && j < 5 && j >= 0) {
-            return tabuleiro[i][j] == ' ';
-        } else {
+    public boolean verificaJogada(int i, int j) { //verifica se a jogada eh valida
+        try {
+            Integer.parseInt(tabuleiro[i][j]);
+            return true;
+        } catch (NumberFormatException e) {
             return false;
         }
     }
 
-    public void setJogador(int jogador) {
-        this.jogador = jogador - 1;
+    public void setJogador(int jogador) { //coloca o jogador a jogar primeiro
+        if (jogador > 0 && jogador < 3) {
+            this.jogador = jogador - 1;
+        } else {
+            System.out.println("Jogador Invalido");
+            System.out.println("Jogador 1 Primeiro");
+        }
     }
 
-    public void vezJogador() {
+    public void vezJogador() { //Mostra a vez de quem que eh
         System.out.println("\n\nVez do Jogador " + (jogador + 1));
         mostrarTabuleiro();
         System.out.print("Sua jogada: ");
     }
 
-    public void addJogada(int i, int j) {
+    public void addJogada(int jogada) {
+        int i = stringToInt(jogadas.get(jogada - 1))[0];
+        int j = stringToInt(jogadas.get(jogada - 1))[1];
         if (verificaJogada(i, j)) {//se a jogada for valida
             if (i % 2 == 0) {//horizontal ou vertical
-                tabuleiro[i][j] = '-';//marca o tabuleiro
+                tabuleiro[i][j] = "-";//marca o tabuleiro
             } else {//vertical
-                tabuleiro[i][j] = '|';//marca o tabuleiro
+                tabuleiro[i][j] = "|";//marca o tabuleiro
             }
             boolean jogarDeNovo = false; //saber se vai jogar de novo
-            for (int index = 0; index < quadrados.size(); index++) {
+            for (int index = 0; index < quadrados.size(); index++) {//verifica cada quadrado
                 if (quadrados.get(index).verificaLinha(i, j)) {//verifica se o quadrado tem a linha
                     if (quadrados.get(index).fechouQuadrado()) {//verifica se o quadrado foi fechado
                         jogarDeNovo = true;//jogador joga de novo
@@ -96,9 +113,6 @@ public class Tabuleiro {
             if (!jogarDeNovo) {//alterna o jogador
                 if (jogador == 0) {
                     jogador = 1;
-                    int[] jogada = stringToInt(getJogada());
-                    vezJogador();
-                    addJogada(jogada[0], jogada[1]);
                 } else {
                     jogador = 0;
                 }
@@ -113,14 +127,8 @@ public class Tabuleiro {
                 }
             }
         } else {
-            if (jogador == 1) {
-                int[] jogada = stringToInt(getJogada());
-                vezJogador();
-                addJogada(jogada[0], jogada[1]);
-            } else {
-                System.out.println("\n\n\n\n\n\n\n");
-                System.out.println("JOGADA INVALIDA");
-            }
+            System.out.println("\n\n\n\n\n\n\n");
+            System.out.println("JOGADA INVALIDA");
         }
     }
 
@@ -130,9 +138,9 @@ public class Tabuleiro {
 
     public void marcaX(Quadrado quadrado, int jogador) { //funcao para trocar o X pelo numero do jogador
         if (jogador == 0) {
-            tabuleiro[quadrado.getAresta().getPosX() + 1][quadrado.getAresta().getPosY() + 1] = '1';
+            tabuleiro[quadrado.getAresta().getPosX() + 1][quadrado.getAresta().getPosY() + 1] = "1";
         } else {
-            tabuleiro[quadrado.getAresta().getPosX() + 1][quadrado.getAresta().getPosY() + 1] = '2';
+            tabuleiro[quadrado.getAresta().getPosX() + 1][quadrado.getAresta().getPosY() + 1] = "2";
         }
     }
 
@@ -149,28 +157,10 @@ public class Tabuleiro {
     public void mostrarTabuleiro() {//funcao para printar o tabuleiro
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 5; j++) {
-                if (tabuleiro[i][j] == ' ') {
-                    System.out.print(i + "" + j + " ");
-                } else {
-                    System.out.print(tabuleiro[i][j] + " ");
-                }
+                System.out.print(tabuleiro[i][j] + " ");
             }
             System.out.println();
         }
-    }
-
-    public void jogadasPossiveis() {
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 5; j++) {
-                if (tabuleiro[i][j] == ' ') {
-                    addJogadas(intToString(i, j));
-                }
-            }
-        }
-    }
-
-    public void addJogadas(String pos) {
-        this.jogadas.add(pos);//adiciona as jogadas possiveis no array
     }
 
     public String intToString(int i, int j) {//transforma 2 posicoes INT em String
@@ -179,28 +169,10 @@ public class Tabuleiro {
         return s;
     }
 
-    public int escolheJogada() {//escolhe a proxima jogada da maquina Aleatoriamente
-        Random ran = new Random();
-        jogadasPossiveis();
-        System.out.println(jogadas);
-        int pos = ran.nextInt(0, jogadas.size());
-        return pos;
-    }
-
     public int[] stringToInt(String s) {
         int saida[] = new int[2];
         saida[0] = Character.getNumericValue(s.charAt(0));
         saida[1] = Character.getNumericValue(s.charAt(1));
-        zerarJogadas();
         return saida;
     }
-
-    public String getJogada() { //pega uma jogada
-        return jogadas.get(escolheJogada());
-    }
-
-    public void zerarJogadas() { //zera as jogadas possiveis
-        jogadas.clear();
-    }
-
 }
