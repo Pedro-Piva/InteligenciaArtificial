@@ -1,5 +1,6 @@
 package tabuleiro;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 /**
@@ -13,11 +14,15 @@ public class Main {
      */
     public static void main(String[] args) {
         Tabuleiro tabuleiro = new Tabuleiro();//objeto tabuleiro
+        Boolean[] vetor = new Boolean[12];
+        for(int i = 0; i < 12; i++){
+            vetor[i] = true;
+        }
+        No raiz = new No(-1, vetor);
         Scanner sc = new Scanner(System.in); //entrada 
         System.out.print("Informe o Jogador a comecar 1 ou 2: ");//dois jogadores, ou nao
-        int inicial = 0;
         try{
-            inicial = sc.nextInt();
+            int inicial = sc.nextInt();
             tabuleiro.setJogador(inicial);
         } catch (Exception e){
             String lixo = sc.nextLine();
@@ -30,8 +35,8 @@ public class Main {
                 int jogada = sc.nextInt(); //pega a jogada
                 tabuleiro.addJogada(jogada); //adciona a jogada se for valida
             } catch (Exception e){ //se nao for um numero
-                System.out.println("Informe um numero valido");
                 String lixo = sc.nextLine(); //pega o resto para ser possivel executar de novo
+                System.out.println("Informe uma jogada Valida");
             }
         }
         System.out.println("\n\n\n\n");

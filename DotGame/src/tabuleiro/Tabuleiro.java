@@ -31,11 +31,11 @@ public class Tabuleiro {
         tabuleiro[3][1] = "x";
         tabuleiro[3][3] = "x";
 
-        int cont = 0;
+        int cont = 1;
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 5; j++) {
                 if (tabuleiro[i][j] == null) {
-                    tabuleiro[i][j] = Integer.toString(cont + 1);//preenchendo as jogadas
+                    tabuleiro[i][j] = Integer.toString(cont);//preenchendo as jogadas
                     jogadas.add(i + "" + j); // mapeando as jogadas
                     cont++;
                 }
@@ -71,7 +71,7 @@ public class Tabuleiro {
 
     public boolean verificaJogada(int i, int j) { //verifica se a jogada eh valida
         try {
-            Integer.parseInt(tabuleiro[i][j]);
+            Integer.valueOf(tabuleiro[i][j]);
             return true;
         } catch (NumberFormatException e) {
             return false;
